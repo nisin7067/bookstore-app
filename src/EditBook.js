@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import api from './api';
 import './EditBook.css'; // Import CSS for styling
 
 const EditBook = () => {
@@ -23,18 +22,16 @@ const EditBook = () => {
   }, [bookId]); // Fetch book data when the bookId changes
 
   const fetchBookData = () => {
-    api
-      .get(`http://localhost:5000/api/books/${bookId}`)
+    fetch(`http://localhost:5000/api/books/${bookId}`)
       .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
+        if (!response.ok) {
           throw new Error('Failed to fetch book data');
         }
+        return response.json();
       })
       .then((data) => {
         setBook({
-          title: data.title || "",
+          title: data.title || '',
           author: data.author || '',
           description: data.description || '',
           price: data.price || '',
@@ -69,12 +66,14 @@ const EditBook = () => {
       return;
     }
 
-    api
-      .put(`http://localhost:5000/api/books/${bookId}`, book, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Include token in Authorization header
-        },
-      })
+    fetch(`http://localhost:5000/api/books/${bookId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`, // Include token in Authorization header
+      },
+      body: JSON.stringify(book),
+    })
       .then((response) => {
         if (response.ok) {
           console.log('Book updated successfully');

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
-import api from './api';
 import './BookList.css'; // Import CSS for styling
 
 const BooksList = () => {
@@ -14,17 +13,12 @@ const BooksList = () => {
   }, []); // Empty dependency array to run the effect only once on component mount
 
   const fetchBooks = () => {
-    fetch('http://localhost:5000/api/books', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    fetch('http://localhost:5000/api/books')
       .then((response) => {
-        if (response.ok) {
-          return response.json();
+        if (!response.ok) {
+          throw new Error('Failed to fetch books');
         }
-        throw new Error('Failed to fetch books');
+        return response.json();
       })
       .then((data) => {
         setBooks(data); // Set books state with fetched data
@@ -49,13 +43,14 @@ const BooksList = () => {
       // Display error message or redirect to login page
       return;
     }
-  
-    api
-      .delete(`http://localhost:5000/api/books/${bookId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Include token in Authorization header
-        },
-      })
+
+    fetch(`http://localhost:5000/api/books/${bookId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`, // Include token in Authorization header
+      },
+    })
       .then((response) => {
         if (response.ok) {
           console.log('Book deleted successfully');
@@ -69,8 +64,6 @@ const BooksList = () => {
         console.error('Error deleting book:', error);
       });
   };
-  
-  
 
   return (
     <div className="books-list">

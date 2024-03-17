@@ -5,6 +5,7 @@ import AdminDashboard from './AdminDashboard';
 import Cart from './Cart';
 import AdminLogin from './AdminLogin';
 import BookCatalog from './BookCatalog';
+import UserLogin from './UserLogin';
 
 const Header = () => {
   const [cartItems, setCartItems] = useState([]); // State to store cart items
@@ -36,7 +37,8 @@ const Header = () => {
         <Route path='/admin-login' element={<AdminLogin />} />
         <Route path='/cart' element={<Cart />} />
         <Route path="/" element={<BookCatalog />} />
-        {/* Other routes */}
+        <Route path="/user-login" element={<UserLogin />} />
+    
       </Routes>
     </Router>
   );
