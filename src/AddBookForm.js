@@ -1,0 +1,114 @@
+import React, { useState } from 'react';
+import api from './api';
+import './AddBookForm.css'; // Import CSS for styling
+
+const AddBookForm = () => {
+  const [formData, setFormData] = useState({
+    title: '',
+    author: '',
+    description: '',
+    price: '',
+    quantity: '',
+    category: '',
+  });
+  const [error, setError] = useState(null); // State for error message
+  const [successMessage, setSuccessMessage] = useState('');
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('adminToken'); // Retrieve token from localStorage
+    api
+      .post('/books', formData, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include token in Authorization header
+        },
+      })
+      .then((response) => {
+        if (response.ok) {
+          console.log('Book added successfully');
+          setError(null); // Clear error on success
+          setSuccessMessage('Book has been added successfully'); // Set success message
+          alert('Book has been added successfully'); // Show alert
+        } else {
+          if (response.status === 401) {
+            setError('Unauthorized. Please log in again.'); // Handle unauthorized error
+          } else {
+            response.json().then((data) => {
+              setError(data.error || 'Error adding book. Please try again.'); // Set error message
+            });
+          }
+        }
+      })
+      .catch((error) => {
+        console.error('Error adding book:', error);
+        setError('Error adding book. Please try againsss.'); // Set error message
+      });
+  };
+
+  return (
+    <div className="add-book-container">
+      {error && <div className="error-message">{error}</div>} {/* Render error message */}
+      {successMessage && <div className="success-message">{successMessage}</div>} {/* Render success message */}
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="title">Title:</label>
+        <input
+          type="text"
+          id="title"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+        />
+        <label htmlFor="author">Author:</label>
+        <input
+          type="text"
+          id="author"
+          name="author"
+          value={formData.author}
+          onChange={handleChange}
+        />
+        <label htmlFor="description">Description:</label>
+        <textarea
+          id="description"
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+        />
+        <label htmlFor="price">Price:</label>
+        <input
+          type="number"
+          id="price"
+          name="price"
+          value={formData.price}
+          onChange={handleChange}
+        />
+        <label htmlFor="quantity">Quantity:</label>
+        <input
+          type="number"
+          id="quantity"
+          name="quantity"
+          value={formData.quantity}
+          onChange={handleChange}
+        />
+        <label htmlFor="category">Category:</label>
+        <input
+          type="text"
+          id="category"
+          name="category"
+          value={formData.category}
+          onChange={handleChange}
+        />
+        <button type="submit">Add Book</button>
+      </form>
+    </div>
+  );
+};
+
+export default AddBookForm;
